@@ -1,0 +1,23 @@
+#:import FD python_files.files_path.FileDirectories
+MainManager:
+    Screen:
+        id: presplash
+        name: "presplash"
+        BoxLayout:
+            orientation: 'vertical'
+            MDLabel:
+                text: '[font={}]T M S[/font]'.format(FD.lato_bold)
+                halign: "center"
+                font_style: "H2"
+                markup: True
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+            Image:
+                source: FD.loading_gif1
+                anim_delay: 1/60
+    
+    Screen:
+        id: manager_screen
+        name: "manager_screen"
+        Manager:
+            id: manager
