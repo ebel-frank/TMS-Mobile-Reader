@@ -10,7 +10,8 @@ from kivy.clock import Clock
 from kivy.utils import platform
 from kivy.uix.screenmanager import ScreenManager
 # python imports
-from multiprocessing import Process, set_start_method
+from threading import Thread
+from time import sleep
 # local imports
 from python_files.files_path import FileDirectories
 
@@ -33,13 +34,13 @@ class TMSReaderApp(MDApp):
         return Builder.load_file(FileDirectories.main_kv_file)
     
     def on_start(self):
-        print(platform)
-        if platform == "win":
-            set_start_method("spawn")
-        Process(target=self.init_loading_sequence).start()
+        Thread(target=self.init_loading_sequence).start()
         return super().on_start()
     
     def init_loading_sequence(self):
+        ############################################################################################333333333
+        # Remove in Production
+        sleep(5)
         self.import_classes()
         self.load_kv_files()
         self.link_widgets()
