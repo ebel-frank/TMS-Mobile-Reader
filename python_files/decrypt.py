@@ -26,7 +26,7 @@ def decryptFile(file_name: str) -> bool:
     
     ## read all data in the file
     if file_name == "":
-    	return False
+        return False
     with open(file_name, 'rb') as f:
         file = f.read()
         
