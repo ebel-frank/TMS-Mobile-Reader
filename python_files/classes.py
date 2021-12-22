@@ -22,7 +22,7 @@ from kivymd.uix.list import MDList
 from kivymd.uix.behaviors import TouchBehavior
 from kivymd.uix.bottomnavigation import MDBottomNavigation, MDBottomNavigationItem
 from kivymd.uix.list.list import IRightBodyTouch, IconLeftWidgetWithoutTouch, OneLineAvatarIconListItem, TwoLineAvatarIconListItem
-from math import ceil
+from math import ceil, floor
 #######################################################################
 
 
@@ -97,7 +97,7 @@ class BottomNavWindow(MDBottomNavigation):
         self._tab_child.parent.remove_widget(self._tab_child)
         tab.add_widget(self._tab_child)
         self.current_tab = self.tabs.index(tab)
-        self.scrollview_obj.reset_list()
+        self.scrollview_obj.reset_list(self.current_tab)
 
     def _create_tab_child(self):
         '''
@@ -182,33 +182,52 @@ class BottomNavWindow(MDBottomNavigation):
 
     class TMSScrollView(ScrollView):
         documents_list = ListProperty([])
+        current_tab = NumericProperty(0)
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.effect_cls = "ScrollEffect"
             self.bind(scroll_y=self.scroll_y_changed)
+            self.documents_list_counts = []
             self.current_set_count = 1
-            self.current_tab = 0
+            self.max_list_object = 10
+            self.current_display_list = []
         
-        def scroll_y_changed(self, *args): 
+        def scroll_y_changed(self, *args):
             if self.scroll_y <= 0:
-                max_num = ceil(self.documents_list_counts[self.current_tab]/10)
+                max_num = ceil(self.documents_list_counts[self.current_tab]/self.max_list_object)
                 if self.current_set_count < max_num:
                     self.current_set_count += 1
-                    self.scroll_y = ((self.documents_list_counts[self.current_tab] % 10)/9) * 0.99999 if self.current_set_count == max_num else 0.99999
+                    self.scroll_y = ((self.documents_list_counts[self.current_tab] % self.max_list_object)/(self.max_list_object-1)) * 0.99999 if self.current_set_count == max_num else 0.99999
+                    self.rearrange_display_list()
             elif self.scroll_y >= 1:
-                max_num = ceil(self.documents_list_counts[self.current_tab]/10)
+                max_num = ceil(self.documents_list_counts[self.current_tab]/self.max_list_object)
                 if self.current_set_count > 1:
                     self.current_set_count -= 1
-                    self.scroll_y = 0.99999 - ((self.documents_list_counts[self.current_tab] % 10)/9) if self.current_set_count == 1 else 0.00001  
+                    self.scroll_y = 0.99999 - ((self.documents_list_counts[self.current_tab] % self.max_list_object)/(self.max_list_object-1)) if self.current_set_count == 1 else 0.00001  
+                    self.rearrange_display_list()
                     
-            print(self.current_set_count)
+        def rearrange_display_list(self):
+            li = self.documents_list[self.current_tab]
+            last_num_selected = self.max_list_object * self.current_set_count
+            floor_num = floor(self.documents_list_counts[self.current_tab]/self.max_list_object)
+            if floor_num == self.current_set_count:
+                self.current_display_list = li[last_num_selected-self.max_list_object:last_num_selected]
+            else:
+                self.current_display_list = li[last_num_selected-self.max_list_object*2:][::-1][:self.max_list_object][::-1]
+            self.update_list_items()
+            
+        def update_list_items(self):
+            pass
 
         def on_documents_list(self, *args):
             self.documents_list_counts = [len(i) for i in self.documents_list]
-            self.reset_list()
+            self.reset_list(self.current_tab)
         
-        def reset_list(self):
+        def reset_list(self, current_tab):
             self.current_set_count = 1
+            self.scroll_y = 1
+            self.current_tab = current_tab
+            self.rearrange_display_list()
 
 
 class Manager(ScreenManager):
