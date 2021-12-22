@@ -1,6 +1,4 @@
 
-from types import FunctionType
-
 
 class FileDirectories:
     android_home = "/storage/emulated/0/"
@@ -12,6 +10,7 @@ class FileDirectories:
     main_kv_file = kv_dir + "main.kv"
     login_kv_file = kv_dir + "login_signout.kv"
     custom_kv_file = kv_dir + "custom_classes.kv"
+    manager_kv_file = kv_dir + "manager.kv"
     
     # Fonts directory
     lato_black = font_dir + "Lato-Black.ttf"
@@ -38,5 +37,5 @@ class FileDirectories:
     white_color = (1, 1, 1, 1)
 
     # sudo components
-    local_files = [['Project description', 'Today'] if i < 15 else ['Project description', 'Yesterday'] for i in range(10)]
-    cloud_files = [['Project description'] if i < 15 else ['Project description',] for i in range(10)]
+    local_files = [[f'Project description{i}', 'Today'] for i in range(11)]
+    cloud_files = [[f'Project description{i}', ''] for i in range(21)]

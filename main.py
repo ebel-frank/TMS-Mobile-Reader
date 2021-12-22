@@ -4,23 +4,17 @@ __version__ = "0.0.0"
 from kivy import require as kivyRequire
 kivyRequire("2.0.0")
 from kivymd.app import MDApp
-from kivy.uix.label import Label
 from kivy.factory import Factory
 from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.utils import platform
+from kivy.weakproxy import WeakProxy
 from kivy.uix.screenmanager import ScreenManager
 # python imports
 from threading import Thread
-from time import sleep
+import time
 # local imports
 from python_files.files_path import FileDirectories
-from python_files.classes import MainTabs
-from python_files.custom_classes import ToolBarTitle, BottomNavWindow
-
-
-class Manager(ScreenManager):
-    pass
 
 
 class MainManager(ScreenManager):
@@ -46,13 +40,9 @@ class TMSReaderApp(MDApp):
         When all files are loaded and linked, it switches the screen to the loaded screen. 
         Run a seperate thread.
         '''
-        ############################################################################################
-        # Remove in Production
-        sleep(1)
-        ############################################################################################
         self.import_classes()
         self.load_kv_files()
-        self.link_widgets()
+        Clock.schedule_once(lambda x: self.link_widgets())
         # Change to loaded screen
         self.root.current = "manager_screen"
     
@@ -60,28 +50,30 @@ class TMSReaderApp(MDApp):
         '''
         Dynamically imports python classes.
         '''
-        #exec("from python_files.custom_classes import *")
-        exec("from python_files.classes import LogIn")
+        exec("from python_files.custom_classes import *")
+        exec("from python_files.classes import *")
         
 
     def load_kv_files(self):
         '''
         Builds other kv files not yet loaded (lazy build).
         '''
-        #Builder.load_file(FileDirectories.custom_kv_file)
+        Builder.load_file(FileDirectories.manager_kv_file)
         Builder.load_file(FileDirectories.login_kv_file)
     
     def link_widgets(self):
         '''
         links all loaded objects (widgets) correctly
         '''
-        # widgets_obj = Factory.MainTabs()
+        widgets_obj = Factory.Manager()
+        self.root.ids.manager_screen.add_widget(widgets_obj)
+        self.root.ids.update({"manager":WeakProxy(widgets_obj)})
         # self.root.ids.manager.add_widget(widgets_obj)
         # self.root.ids.update(widgets_obj.ids)
         #
-        widgets_obj = Factory.LogIn()
-        self.root.ids.manager.add_widget(widgets_obj)
-        self.root.ids.update(widgets_obj.ids)
+        # widgets_obj = Factory.LogIn()
+        # self.root.ids.manager.add_widget(widgets_obj)
+        # self.root.ids.update(widgets_obj.ids)
 
 
 if __name__ == '__main__':

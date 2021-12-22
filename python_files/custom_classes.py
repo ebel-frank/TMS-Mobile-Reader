@@ -1,7 +1,7 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.screenmanager import NoTransition
+from threading import Thread
 from kivy.uix.scrollview import ScrollView
 from kivy.graphics import Color, Rectangle
 from kivy.metrics import dp
@@ -211,7 +211,7 @@ class ToolBarTitle(BoxLayout):
         self.right_title_icon.bind(**self.right_bind)
 
 
-class BottomNavWindow(MDBottomNavigation):
+class dBottomNavWindow(MDBottomNavigation):
     '''
     BottomNavWindow:
         designed for use in the TMS mobile application application.
