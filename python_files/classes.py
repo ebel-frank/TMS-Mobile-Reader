@@ -80,6 +80,34 @@ class BottomNavWindow(MDBottomNavigation):
         
     def on_current_tab(self, *args):
         self.scrollview_obj.current_tab = self.current_tab
+
+    def on_file_icon(self, *args):
+        '''
+        Updates the file icon on the left to the specified one by file_icon.
+        '''
+        for item in self.icon_item_obj:
+            item.icon = self.file_icon
+
+    def on_list_icon(self, *args):
+        '''
+        Updates the file icon on the left to the specified one by file_icon.
+        '''
+        for item in self.option_item_obj:
+            item.icon = self.list_icon
+    
+    def on_win_x_padding(self, *args):
+        '''
+        updates the horizontal width of the scrollable view.
+        '''
+        for box in self.box2_list:
+            box.size_hint_x = self.win_x_padding
+    
+    def on_win_y_padding(self, *args):
+        '''
+        updates the vertical width of the scrollable view.
+        '''
+        for box in self.box2_list:
+            box.size_hint_y = self.win_y_padding
     
     def _create_tabs(self):
         '''
@@ -130,8 +158,9 @@ class BottomNavWindow(MDBottomNavigation):
         Initiate the Addition of the given list item of the corresponding documents specified.
         '''
         self._add_list_items()
+        self.scrollview_obj.update_list_items(self.mdlist_obj[0])
         self.scrollview_obj.documents_list=self.documents_list
-
+         
     def _add_list_items(self):
         '''
         function that adds the list items to the scrollview.
@@ -158,16 +187,6 @@ class BottomNavWindow(MDBottomNavigation):
             self.outter_class.open_bottom_sheet()
 
     
-    class OneItemList(OneLineAvatarIconListItem, TouchBehavior):
-        def __init__(self, **kwargs) -> None:
-            self.outter_class = kwargs['parent_class']
-            kwargs.pop("parent_class")
-            super().__init__(**kwargs)
-
-        def on_long_touch(self, a, b):
-            self.outter_class.open_bottom_sheet()
-
-
     class OptionListItem(IRightBodyTouch, MDIconButton):
         adaptive_width = True
         def __init__(self, **kwargs) -> None:
@@ -186,11 +205,13 @@ class BottomNavWindow(MDBottomNavigation):
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.effect_cls = "ScrollEffect"
+            self.bar_width = 0
             self.bind(scroll_y=self.scroll_y_changed)
             self.documents_list_counts = []
             self.current_set_count = 1
             self.max_list_object = 10
             self.current_display_list = []
+            self.list_objects = []
         
         def scroll_y_changed(self, *args):
             if self.scroll_y <= 0:
@@ -210,14 +231,19 @@ class BottomNavWindow(MDBottomNavigation):
             li = self.documents_list[self.current_tab]
             last_num_selected = self.max_list_object * self.current_set_count
             floor_num = floor(self.documents_list_counts[self.current_tab]/self.max_list_object)
-            if floor_num == self.current_set_count:
+            if floor_num >= self.current_set_count:
                 self.current_display_list = li[last_num_selected-self.max_list_object:last_num_selected]
             else:
                 self.current_display_list = li[last_num_selected-self.max_list_object*2:][::-1][:self.max_list_object][::-1]
             self.update_list_items()
             
-        def update_list_items(self):
-            pass
+        def update_list_items(self, obj=None):
+            if obj is None:
+                for i in range(self.max_list_object):
+                    self.list_objects[self.max_list_object-1-i].text = self.current_display_list[i][0]
+                    self.list_objects[self.max_list_object-1-i].secondary_text = self.current_display_list[i][1]
+            else:
+                self.list_objects = obj.children
 
         def on_documents_list(self, *args):
             self.documents_list_counts = [len(i) for i in self.documents_list]
