@@ -22,27 +22,7 @@ MainManager:
     Screen:
         id: manager_screen
         name: "manager_screen"
-        Manager:
-            id: manager
-            # App's Screens
-            MainTabs:
-                id: main_tabs
-                name: "main_tabs"
-                ToolBarTitle:
-                    id: tool_bar
-                    text: "[font_family={}][b]T M S[/b][/font_family]".format(FD.segoe_font)
-                    bg_source: FD.toolbar_bg_img1
-                    on_kv_post:
-                        main_tabs.remove_widget(self)
-                        main_tabs.add_widget(self)
-                BottomNavWindow:
-                    id: nav_window
-                    add_tabs: [['recent', 'recent', 'timelapse'], ['local', 'local', 'library'], ['cloud', 'cloud', 'library']]
-                    documents_list: [FD.local_files, FD.cloud_files, FD.cloud_files]
-                    panel_color: FD.tab_nav_color
-                    bg_color: FD.tab_bg_color
-                    file_icon: FD.file_icon
-                    items_bg_color: FD.tab_item_color
-                    items_div_color: FD.tab_nav_color                
+        
+            
                    
     
