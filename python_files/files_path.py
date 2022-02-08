@@ -37,5 +37,5 @@ class FileDirectories:
     white_color = (1, 1, 1, 1)
 
     # sudo components
-    local_files = [[f'Project description{i}', 'Today'] for i in range(33)]
-    cloud_files = [[f'Project description{i}', ' '] for i in range(21)]
+    local_files = [{'text': f'Project description{i}', 'secondary_text':'Today'} for i in range(33)]
+    cloud_files = [{'text': f'Project{i}', 'secondary_text': ''} for i in range(21)]

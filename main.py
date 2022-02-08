@@ -7,12 +7,10 @@ from kivymd.app import MDApp
 from kivy.factory import Factory
 from kivy.lang import Builder
 from kivy.clock import Clock
-from kivy.utils import platform
 from kivy.weakproxy import WeakProxy
 from kivy.uix.screenmanager import ScreenManager
 # python imports
 from threading import Thread
-import time
 # local imports
 from python_files.files_path import FileDirectories
 
@@ -60,6 +58,7 @@ class TMSReaderApp(MDApp):
         '''
         Builder.load_file(FileDirectories.manager_kv_file)
         Builder.load_file(FileDirectories.login_kv_file)
+        Builder.load_file(FileDirectories.custom_kv_file)
     
     def link_widgets(self):
         '''
