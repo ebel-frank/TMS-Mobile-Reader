@@ -1,7 +1,6 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.scrollview import ScrollView
 from kivy.uix.screenmanager import NoTransition
 from kivy.graphics import Color, Rectangle
 from kivy.metrics import dp
@@ -9,16 +8,24 @@ from kivy.properties import (
     NumericProperty, 
     ColorProperty, 
     ListProperty, 
-    ObjectProperty,
     StringProperty, 
     DictProperty)
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDIconButton
-from kivymd.uix.list import MDList
-from kivymd.uix.behaviors import TouchBehavior
+#from kivymd.uix.list import MDList
 from kivymd.uix.bottomnavigation import MDBottomNavigation, MDBottomNavigationItem
+
 from kivymd.uix.list.list import IRightBodyTouch, IconLeftWidgetWithoutTouch, TwoLineAvatarIconListItem
-from math import ceil, floor
+from kivymd.uix.behaviors import TouchBehavior
+from python_files.files_path import FileDirectories as FD
+from kivy.lang import Builder
+from kivy.uix.recycleview import RecycleView
+from kivy.uix.recycleview.views import RecycleDataViewBehavior
+from kivy.properties import BooleanProperty
+from kivy.uix.recycleboxlayout import RecycleBoxLayout
+from kivy.uix.behaviors import FocusBehavior
+from kivy.uix.recycleview.layout import LayoutSelectionBehavior
+##########################################################################################################################
 
 class ToolBarTitle(BoxLayout):
     '''
@@ -211,6 +218,86 @@ class ToolBarTitle(BoxLayout):
         '''
         self.right_title_icon.bind(**self.right_bind)
 
+##############################################################################################################
+##############################################################################################################
+
+class OptionListItem(IRightBodyTouch, MDIconButton):
+        adaptive_width = True
+        def on_release(self):
+            #self.outter_class.open_bottom_sheet()
+            return super().on_release()
+
+
+class LeftIcon(BoxLayout, IconLeftWidgetWithoutTouch):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.icon=FD.file_icon
+        #self.size_hint = (.2, .9)
+
+
+class TwoItemList(TwoLineAvatarIconListItem, TouchBehavior):
+    clicked_name = None
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)   
+        self.left_icon_obj = LeftIcon()
+        self.option_obj = OptionListItem(icon = "dots-vertical")
+        self.add_widget(self.left_icon_obj)
+        self.add_widget(self.option_obj)   
+
+    def on_release(self):
+        print(self.clicked_name)
+        return super().on_release()  
+    
+    def on_long_touch(self, *args):
+        # self.outter_class.open_bottom_sheet()
+        pass
+
+    def called_by_parent(self, data:dict):
+        '''
+        function called by instance to update the document selected.
+        '''
+        self.clicked_name = data['text']
+    
+    def pop_btm_window(self):
+        '''
+        opens the bottom drawer.
+        '''
+    
+class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
+                                RecycleBoxLayout):
+    ''' Adds selection and focus behaviour to the view. '''
+
+
+class SelectableLabel(RecycleDataViewBehavior, TwoItemList):
+    ''' Add selection support to the Label '''
+    index = None
+    selected = BooleanProperty(False)
+    selectable = BooleanProperty(True)
+
+    def refresh_view_attrs(self, rv, index, data):
+        ''' Catch and handle the view changes '''
+        self.index = index
+        return super(SelectableLabel, self).refresh_view_attrs(
+            rv, index, data)
+
+    def on_touch_down(self, touch):
+        ''' Add selection on touch down '''
+        if super(SelectableLabel, self).on_touch_down(touch):
+            return True
+        if self.collide_point(*touch.pos) and self.selectable:
+            return self.parent.select_with_touch(self.index, touch)
+
+    def apply_selection(self, rv, index, is_selected):
+        ''' Respond to the selection of items in the view. '''
+        self.called_by_parent(rv.data[index])
+        
+
+class RV(RecycleView):
+    def __init__(self, data, **kwargs):
+        super(RV, self).__init__(**kwargs)
+        self.data = data
+        
+
 
 class BottomNavWindow(MDBottomNavigation):
 
@@ -227,8 +314,6 @@ class BottomNavWindow(MDBottomNavigation):
     items_div_color = ColorProperty([.9, .9, .9, 1])
 
     documents_list = ListProperty([])
-
-    list_icon = StringProperty("dots-vertical")
 
     file_icon = StringProperty("file")
 
@@ -248,23 +333,13 @@ class BottomNavWindow(MDBottomNavigation):
         '''
         self._create_tabs()
         self.children[1].transition = NoTransition()
+
     def on_bg_color(self, *args):
         '''
         Updates the background color on bg_color specification
         '''
         tab = self.tabs[self.current_tab]
-        tab.children[0].color_obj.rgba = self.bg_color
-    
-    def on_items_bg_color(self, *args):
-        '''
-        Updates the background color of the list items.
-        '''
-        tab = self.mdlist_obj[self.current_tab]
-        for item in tab.children:
-            item.bg_color = self.items_bg_color
-        
-    def on_current_tab(self, *args):
-        self.scrollview_obj.current_tab = self.current_tab
+        tab.children[0].color_obj.rgba = self.bg_color        
 
     def on_file_icon(self, *args):
         '''
@@ -310,8 +385,8 @@ class BottomNavWindow(MDBottomNavigation):
         self._tab_child.parent.remove_widget(self._tab_child)
         tab.add_widget(self._tab_child)
         self.current_tab = self.tabs.index(tab)
-        self.scrollview_obj.reset_list(self.current_tab)
-
+        self.scrollview_obj.data = self.documents_list[self.current_tab]
+        
     def _create_tab_child(self):
         '''
         creates the scrollview and layout of the window and adds it to the parent bare body.
@@ -323,10 +398,7 @@ class BottomNavWindow(MDBottomNavigation):
         with self.box1.canvas.before:
            self.box1.color_obj = Color(rgba=self.bg_color)
            self.box1.rect_obj = Rectangle(size=self.box1.size, pos=self.box1.size)
-        # add scrollview to box layout
-        self.mdlist_obj.append(MDList(spacing=(dp(0), dp(5))))
-        self.scrollview_obj = self.TMSScrollView()
-        self.scrollview_obj.add_widget(self.mdlist_obj[-1])
+        self.scrollview_obj = RV(self.documents_list[0])
         box2.add_widget(self.scrollview_obj)
         self.box1.add_widget(box2)
         return self.box1
@@ -342,112 +414,9 @@ class BottomNavWindow(MDBottomNavigation):
         '''
         Initiate the Addition of the given list item of the corresponding documents specified.
         '''
-        self._add_list_items()
-        self.scrollview_obj.update_list_items(self.mdlist_obj[0])
-        self.scrollview_obj.documents_list=self.documents_list
+        try:
+            self.scrollview_obj.data = self.documents_list[self.current_tab]
+        except AttributeError as e:
+            print("Scroll View (Recycle View) not yet created!", e,"\nExpected only once" )
+  ##############################################################################################################      
          
-    def _add_list_items(self):
-        '''
-        function that adds the list items to the scrollview.
-        '''
-        tab_obj =  self.mdlist_obj[0]
-        tab_list = self.documents_list[0][:10]
-        for name,  day in tab_list:
-            option_obj = self.OptionListItem(parent_class=self, icon = self.list_icon)
-            icon_left_widget = IconLeftWidgetWithoutTouch(icon=self.file_icon)
-            self.option_item_obj.append(option_obj)
-            self.icon_item_obj.append(icon_left_widget)
-            two_item_list = self.TwoItemList(parent_class=self, text=name, secondary_text=day)
-            two_item_list.add_widget(icon_left_widget)
-            two_item_list.add_widget(option_obj)
-            tab_obj.add_widget(two_item_list)
-    
-    class TwoItemList(TwoLineAvatarIconListItem, TouchBehavior):
-        def __init__(self, **kwargs) -> None:
-            self.outter_class = kwargs['parent_class']
-            kwargs.pop("parent_class")
-            super().__init__(**kwargs)
-        
-        def on_long_touch(self, *args):
-            self.outter_class.open_bottom_sheet()
-
-    
-    class OptionListItem(IRightBodyTouch, MDIconButton):
-        adaptive_width = True
-        def __init__(self, **kwargs) -> None:
-            self.outter_class = kwargs['parent_class']
-            kwargs.pop("parent_class")
-            super().__init__(**kwargs)
-        
-        def on_release(self):
-            self.outter_class.open_bottom_sheet()
-            return super().on_release()
-
-
-    class TMSScrollView(ScrollView):
-        documents_list = ListProperty([])
-        current_tab = NumericProperty(0)
-        def __init__(self, **kwargs):
-            super().__init__(**kwargs)
-            self.effect_cls = "ScrollEffect"
-            self.bar_width = 0
-            self.bind(scroll_y=self.scroll_y_changed)
-            self.documents_list_counts = []
-            self.current_set_count = 1
-            self.max_list_object = 10
-            self.current_display_list = []
-            self.list_objects = []
-        
-        def scroll_y_changed(self, *args):
-            if self.scroll_y <= 0:
-                max_num = ceil(self.documents_list_counts[self.current_tab]/self.max_list_object)
-                if self.current_set_count < max_num:
-                    self.current_set_count += 1
-                    self.scroll_y = ((self.documents_list_counts[self.current_tab] % self.max_list_object)/(self.max_list_object-1)) * 0.99999 if self.current_set_count == max_num else 0.99999
-                    self.rearrange_display_list()
-            elif self.scroll_y >= 1:
-                max_num = ceil(self.documents_list_counts[self.current_tab]/self.max_list_object)
-                if self.current_set_count > 1:
-                    self.current_set_count -= 1
-                    self.scroll_y = 0.99999 - ((self.documents_list_counts[self.current_tab] % self.max_list_object)/(self.max_list_object-1)) if self.current_set_count == 1 else 0.00001  
-                    self.rearrange_display_list()
-                    
-        def rearrange_display_list(self):
-            li = self.documents_list[self.current_tab]
-            last_num_selected = self.max_list_object * self.current_set_count
-            floor_num = floor(self.documents_list_counts[self.current_tab]/self.max_list_object)
-            if floor_num >= self.current_set_count:
-                self.current_display_list = li[last_num_selected-self.max_list_object:last_num_selected]
-            else:
-                self.current_display_list = li[last_num_selected-self.max_list_object*2:][::-1][:self.max_list_object][::-1]
-            self.update_list_items()
-            
-        def update_list_items(self, obj=None):
-            if obj is None:
-                for i in range(self.max_list_object):
-                    self.list_objects[self.max_list_object-1-i].text = self.current_display_list[i][0]
-                    self.list_objects[self.max_list_object-1-i].secondary_text = self.current_display_list[i][1]
-            else:
-                self.list_objects = obj.children
-
-        def on_documents_list(self, *args):
-            self.documents_list_counts = [len(i) for i in self.documents_list]
-            self.reset_list(self.current_tab)
-        
-        def reset_list(self, current_tab):
-            self.current_set_count = 1
-            self.scroll_y = 1
-            self.current_tab = current_tab
-            self.rearrange_display_list()
-if __name__ == "__main__":
-    from kivymd.app import MDApp
-    class Myapp(MDApp):
-        def build(self):
-            superBox = BoxLayout(orientation ='horizontal')
-            
-            btn3 = ToolBarTitle()
-            
-            superBox.add_widget(btn3)
-
-            return superBox
-    Myapp().run()

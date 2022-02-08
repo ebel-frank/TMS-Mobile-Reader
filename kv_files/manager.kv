@@ -13,8 +13,8 @@
         
         BottomNavWindow:
             id: nav_window
-            add_tabs: [['recent', 'recent', 'timelapse'], ['local', 'local', 'library'], ['cloud', 'cloud', 'library'], ['starred', 'starred', 'star']]
-            documents_list: [FD.local_files, FD.cloud_files, FD.cloud_files, FD.cloud_files]
+            documents_list: (FD.local_files, FD.cloud_files, FD.cloud_files, FD.cloud_files)
+            add_tabs: (('recent', 'recent', 'timelapse'), ('local', 'local', 'library'), ('cloud', 'cloud', 'library'), ('starred', 'starred', 'star'))
             panel_color: FD.tab_nav_color
             bg_color: FD.tab_bg_color
             file_icon: FD.file_icon
