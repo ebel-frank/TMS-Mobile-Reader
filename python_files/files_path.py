@@ -11,6 +11,7 @@ class FileDirectories:
     login_kv_file = kv_dir + "login_signout.kv"
     custom_kv_file = kv_dir + "custom_classes.kv"
     manager_kv_file = kv_dir + "manager.kv"
+    document_page_kv_file = kv_dir + "document_page.kv"
     
     # Fonts directory
     lato_black = font_dir + "Lato-Black.ttf"
