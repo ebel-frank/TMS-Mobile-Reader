@@ -12,9 +12,7 @@ from kivy.properties import (
     DictProperty)
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDIconButton
-#from kivymd.uix.list import MDList
 from kivymd.uix.bottomnavigation import MDBottomNavigation, MDBottomNavigationItem
-
 from kivymd.uix.list.list import IRightBodyTouch, IconLeftWidgetWithoutTouch, TwoLineAvatarIconListItem, OneLineListItem
 from kivymd.uix.behaviors import TouchBehavior
 from python_files.files_path import FileDirectories as FD
@@ -26,6 +24,9 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivymd.uix.menu import MDDropdownMenu
+from kivy.clock import Clock
+import os
+from python_files.TMS_database import TMSDatabase
 ##########################################################################################################################
 
 class MenuListItem(OneLineListItem):
@@ -115,7 +116,7 @@ class ToolBarTitle(BoxLayout):
         self.right_box = BoxLayout(size_hint_x=None, width=self.pad_right)
         # Icon
         icon = AnchorLayout(anchor_x='left', anchor_y='center')
-        self.left_title_icon = MDIconButton(icon="account-circle", theme_text_color="Custom", text_color=self.color, pos_hint={"x": 0.5, "y": 0.1})
+        self.left_title_icon = MDIconButton(icon="account-circle", theme_text_color="Custom", text_color=self.color, pos_hint={"x": 0.5, "y": 0.1}, on_press=self.open_profile_page)
         icon.add_widget(self.left_title_icon)
         # Title
         title = BoxLayout(size_hint_x = 10)
@@ -162,6 +163,13 @@ class ToolBarTitle(BoxLayout):
         '''
         self.menu.caller = inst
         self.menu.open()
+    
+    def open_profile_page(self, *args):
+        '''
+        Changes the display page to profile using the manager
+        '''
+        self.parent.parent.transition.direction = 'down'
+        self.parent.parent.current = 'profile'
     
     def close_and_run_menu(self, val):
         '''
@@ -338,6 +346,7 @@ class RV(RecycleView):
         
 
 
+
 class BottomNavWindow(MDBottomNavigation):
 
     add_tabs = ListProperty([])
@@ -365,6 +374,27 @@ class BottomNavWindow(MDBottomNavigation):
         self.icon_item_obj = []
         self.option_item_obj = []
         self.box2_list = []
+        self.local_database = TMSDatabase(FD.database_dir)
+        self._search_dir(None)
+        Clock.schedule_once(self._search_dir, 3) # should be multiprocessed
+
+    def _search_dir(self, *args):
+        try:
+            dirs = []
+            for d in FD.search_dirs:
+                dirs += os.listdir(d)
+            self.dirs = set(dirs)
+            self.dir_names = []
+            for dir in self.dirs:
+                self.dir_names.append(dir.split(".")[0])
+        except:
+            print("Search folder directory failed!")
+        else:
+            self.local_database.sync_db(self.dir_names)
+            try:
+                self.documents_list[0] = [{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_name()]# testing
+            except IndexError as e:
+                print("document variable not yet created!", e,"\nExpected only once" )
 
     def on_add_tabs(self, *args):
         '''

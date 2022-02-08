@@ -1,5 +1,8 @@
 
 
+from re import search
+
+
 class FileDirectories:
     android_home = "/storage/emulated/0/"
     app_home = "./"
@@ -12,6 +15,7 @@ class FileDirectories:
     custom_kv_file = kv_dir + "custom_classes.kv"
     manager_kv_file = kv_dir + "manager.kv"
     document_page_kv_file = kv_dir + "document_page.kv"
+    profile_file = kv_dir + "profile.kv"
     
     # Fonts directory
     lato_black = font_dir + "Lato-Black.ttf"
@@ -40,3 +44,8 @@ class FileDirectories:
     # sudo components
     local_files = [{'text': f'Project description{i}', 'secondary_text':'Today'} for i in range(33)]
     cloud_files = [{'text': f'Project{i}', 'secondary_text': ''} for i in range(21)]
+
+    # Database Directory
+    database_dir = app_home + "assets/databases/"
+    search_dirs = {f'{app_home}', }
+

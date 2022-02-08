@@ -1,7 +1,7 @@
 import sqlite3
 
 
-class TmsDatabase:
+class TMSDatabase:
     def __init__(self, path):
         self.path = path
         """creates a database in the specified path

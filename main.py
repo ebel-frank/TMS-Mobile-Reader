@@ -59,6 +59,7 @@ class TMSReaderApp(MDApp):
         Builder.load_file(FileDirectories.manager_kv_file)
         Builder.load_file(FileDirectories.login_kv_file)
         Builder.load_file(FileDirectories.custom_kv_file)
+        Builder.load_file(FileDirectories.profile_file)
     
     def link_widgets(self):
         '''
