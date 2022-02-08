@@ -13,3 +13,7 @@ class LogIn(Screen):
     pass
 
 
+class Profile(Screen):
+    pass
+
+

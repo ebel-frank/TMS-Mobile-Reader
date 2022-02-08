@@ -12,10 +12,8 @@ from kivy.properties import (
     DictProperty)
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDIconButton
-#from kivymd.uix.list import MDList
 from kivymd.uix.bottomnavigation import MDBottomNavigation, MDBottomNavigationItem
-
-from kivymd.uix.list.list import IRightBodyTouch, IconLeftWidgetWithoutTouch, TwoLineAvatarIconListItem
+from kivymd.uix.list.list import IRightBodyTouch, IconLeftWidgetWithoutTouch, TwoLineAvatarIconListItem, OneLineListItem
 from kivymd.uix.behaviors import TouchBehavior
 from python_files.files_path import FileDirectories as FD
 from kivy.lang import Builder
@@ -25,7 +23,20 @@ from kivy.properties import BooleanProperty
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
+from kivymd.uix.menu import MDDropdownMenu
+from kivy.clock import Clock
+import os
+from python_files.TMS_database import TMSDatabase
 ##########################################################################################################################
+
+class MenuListItem(OneLineListItem):
+    # This is an extension of the ListItem used in the Dropdown menu.
+    # It tries to align the labels to the center which was previously more difficult
+    # used in the app's menu
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.ids._lbl_primary.halign = "center"
+
 
 class ToolBarTitle(BoxLayout):
     '''
@@ -105,7 +116,7 @@ class ToolBarTitle(BoxLayout):
         self.right_box = BoxLayout(size_hint_x=None, width=self.pad_right)
         # Icon
         icon = AnchorLayout(anchor_x='left', anchor_y='center')
-        self.left_title_icon = MDIconButton(icon="account-circle", theme_text_color="Custom", text_color=self.color, pos_hint={"x": 0.5, "y": 0.1})
+        self.left_title_icon = MDIconButton(icon="account-circle", theme_text_color="Custom", text_color=self.color, pos_hint={"x": 0.5, "y": 0.1}, on_press=self.open_profile_page)
         icon.add_widget(self.left_title_icon)
         # Title
         title = BoxLayout(size_hint_x = 10)
@@ -119,7 +130,7 @@ class ToolBarTitle(BoxLayout):
         title.add_widget(self.title_label)
         # menu
         menu = AnchorLayout(anchor_x='right', anchor_y='center')
-        self.right_title_icon = MDIconButton(icon="menu", theme_text_color="Custom", text_color=self.color, pos_hint={"x": 0.5, "y": 0.1})
+        self.right_title_icon = MDIconButton(icon="menu", theme_text_color="Custom", text_color=self.color, pos_hint={"x": 0.5, "y": 0.1}, on_press=self.open_title_menu)
         menu.add_widget(self.right_title_icon)
         # Add to main Layout
         title_icon_menu.add_widget(self.left_box)
@@ -134,6 +145,42 @@ class ToolBarTitle(BoxLayout):
             self.rect_color = Color(rgba=self.bg_color)
             self.rect = Rectangle(size=self.size, pos=self.center)
         self.bind(pos= self.update_rect, size=self.update_rect)
+        # Creating Menu attributes
+        self.logged_in = False
+        menu_names = ("About", "Settings", (lambda x: "Sign in" if not self.logged_in else "Sign out")(None))
+        menu_items = [
+            {
+                "viewclass": "MenuListItem",
+                "text": f'{name}',
+                "on_release": lambda x= f'{name}': self.close_and_run_menu(x)
+            } for name in menu_names
+        ]
+        self.menu = MDDropdownMenu(items=menu_items, width_mult=2, max_height=dp(145), radius=[dp(3)], opening_time=0)
+    
+    def open_title_menu(self, inst):
+        '''
+        called to open menu.
+        '''
+        self.menu.caller = inst
+        self.menu.open()
+    
+    def open_profile_page(self, *args):
+        '''
+        Changes the display page to profile using the manager
+        '''
+        self.parent.parent.transition.direction = 'down'
+        self.parent.parent.current = 'profile'
+    
+    def close_and_run_menu(self, val):
+        '''
+        called to close menu and return to the signup page.
+        '''
+        self.menu.dismiss()
+        if val == "Sign in" or val == "Sign out":
+            # switch the window to the signup window
+            self.parent.parent.current = 'login_signout'
+            # manually focus the first text box of the signup window.
+            #self.parent.parent.focus_signup()
 
     def update_rect(self, *args):
         '''
@@ -299,6 +346,7 @@ class RV(RecycleView):
         
 
 
+
 class BottomNavWindow(MDBottomNavigation):
 
     add_tabs = ListProperty([])
@@ -326,6 +374,27 @@ class BottomNavWindow(MDBottomNavigation):
         self.icon_item_obj = []
         self.option_item_obj = []
         self.box2_list = []
+        self.local_database = TMSDatabase(FD.database_dir)
+        self._search_dir(None)
+        Clock.schedule_once(self._search_dir, 3) # should be multiprocessed
+
+    def _search_dir(self, *args):
+        try:
+            dirs = []
+            for d in FD.search_dirs:
+                dirs += os.listdir(d)
+            self.dirs = set(dirs)
+            self.dir_names = []
+            for dir in self.dirs:
+                self.dir_names.append(dir.split(".")[0])
+        except:
+            print("Search folder directory failed!")
+        else:
+            self.local_database.sync_db(self.dir_names)
+            try:
+                self.documents_list[0] = [{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_name()]# testing
+            except IndexError as e:
+                print("document variable not yet created!", e,"\nExpected only once" )
 
     def on_add_tabs(self, *args):
         '''

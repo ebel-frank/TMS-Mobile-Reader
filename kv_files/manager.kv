@@ -13,7 +13,7 @@
         
         BottomNavWindow:
             id: nav_window
-            documents_list: (FD.local_files, FD.cloud_files, FD.cloud_files, FD.cloud_files)
+            documents_list: [FD.local_files, FD.cloud_files, FD.cloud_files, FD.local_files]
             add_tabs: (('recent', 'recent', 'timelapse'), ('local', 'local', 'library'), ('cloud', 'cloud', 'library'), ('starred', 'starred', 'star'))
             panel_color: FD.tab_nav_color
             bg_color: FD.tab_bg_color
@@ -21,8 +21,10 @@
             items_bg_color: FD.tab_item_color
             items_div_color: FD.tab_nav_color 
     
-    
     LogIn:
         id: login_signout
         name: "login_signout"
+    
+    Profile:
+        name: "profile"
                    
