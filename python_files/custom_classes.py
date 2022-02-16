@@ -273,7 +273,7 @@ class ToolBarTitle(BoxLayout):
 class OptionListItem(IRightBodyTouch, MDIconButton):
         adaptive_width = True
         def on_release(self):
-            print(self.parent.parent.parent.parent.parent.parent)
+            MDApp.get_running_app().open_bottom_sheet()
             return super().on_release()
 
 

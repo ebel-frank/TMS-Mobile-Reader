@@ -87,7 +87,7 @@ class TMSReaderApp(MDApp):
         obj.add_item('Rename file', lambda x: self.rename_file(), 'rename-box')
         # obj.add_item('Share file', lambda x: self.share_file(), 'file-send')
         # obj.add_item('Download audio', lambda x: self.download_audio(), 'download')
-        # obj.open()
+        obj.open()
     
     def add2favourite(self):
         pass
