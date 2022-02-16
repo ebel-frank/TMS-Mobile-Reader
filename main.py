@@ -9,6 +9,7 @@ from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.weakproxy import WeakProxy
 from kivy.uix.screenmanager import ScreenManager
+from kivymd.uix.bottomsheet import MDListBottomSheet
 # python imports
 from threading import Thread
 # local imports
@@ -74,7 +75,36 @@ class TMSReaderApp(MDApp):
         # widgets_obj = Factory.LogIn()
         # self.root.ids.manager.add_widget(widgets_obj)
         # self.root.ids.update(widgets_obj.ids)
+    
+    def open_bottom_sheet(self):
+        '''
+        opens the bottom drawer.
+        '''
+        obj = MDListBottomSheet()
+        obj.add_item('Add to favourite', lambda x: self.add2favourite(), 'star')
+        obj.add_item('Delete file', lambda x: self.delete_file(), 'delete')
+        obj.add_item('Move file', lambda x: self.move_file(), 'folder-move')
+        obj.add_item('Rename file', lambda x: self.rename_file(), 'rename-box')
+        # obj.add_item('Share file', lambda x: self.share_file(), 'file-send')
+        # obj.add_item('Download audio', lambda x: self.download_audio(), 'download')
+        obj.open()
+    
+    def add2favourite(self):
+        pass
 
+    def delete_file(self):
+        pass
+
+    def move_file(self):
+        pass
+
+    def rename_file(self):
+        pass
+
+    # def share_file(self):
+    #     pass
+    # def download_audio(self):
+    #     pass
 
 if __name__ == '__main__':
     TMSReaderApp().run()

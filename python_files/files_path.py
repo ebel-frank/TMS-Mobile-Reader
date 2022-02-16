@@ -47,5 +47,5 @@ class FileDirectories:
 
     # Database Directory
     database_dir = app_home + "assets/databases/"
-    search_dirs = {f'{app_home}', }
+    search_dirs = {f'{app_home}.tms/', }
 

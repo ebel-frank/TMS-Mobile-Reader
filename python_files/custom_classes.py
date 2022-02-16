@@ -1,3 +1,4 @@
+from kivymd.app import MDApp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.anchorlayout import AnchorLayout
@@ -26,6 +27,7 @@ from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.clock import Clock
 import os
+from threading import Thread
 from python_files.TMS_database import TMSDatabase
 ##########################################################################################################################
 
@@ -271,7 +273,7 @@ class ToolBarTitle(BoxLayout):
 class OptionListItem(IRightBodyTouch, MDIconButton):
         adaptive_width = True
         def on_release(self):
-            #self.outter_class.open_bottom_sheet()
+            MDApp.get_running_app().open_bottom_sheet()
             return super().on_release()
 
 
@@ -284,6 +286,7 @@ class LeftIcon(BoxLayout, IconLeftWidgetWithoutTouch):
 
 class TwoItemList(TwoLineAvatarIconListItem, TouchBehavior):
     clicked_name = None
+    is_long_touch = False
     def __init__(self, **kwargs):
         super().__init__(**kwargs)   
         self.left_icon_obj = LeftIcon()
@@ -292,23 +295,25 @@ class TwoItemList(TwoLineAvatarIconListItem, TouchBehavior):
         self.add_widget(self.option_obj)   
 
     def on_release(self):
-        print(self.clicked_name)
+        if not self.is_long_touch:
+            ## code
+            print(self.clicked_name)
+
+        self.is_long_touch = False
         return super().on_release()  
     
     def on_long_touch(self, *args):
-        # self.outter_class.open_bottom_sheet()
+        self.is_long_touch = True
+        MDApp.get_running_app().open_bottom_sheet()
         pass
+
 
     def called_by_parent(self, data:dict):
         '''
         function called by instance to update the document selected.
         '''
         self.clicked_name = data['text']
-    
-    def pop_btm_window(self):
-        '''
-        opens the bottom drawer.
-        '''
+        
     
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
                                 RecycleBoxLayout):
@@ -375,26 +380,29 @@ class BottomNavWindow(MDBottomNavigation):
         self.option_item_obj = []
         self.box2_list = []
         self.local_database = TMSDatabase(FD.database_dir)
-        self._search_dir(None)
-        Clock.schedule_once(self._search_dir, 3) # should be multiprocessed
+        Thread(target=self._search_dir).start() # should be multiprocessed
 
     def _search_dir(self, *args):
         try:
             dirs = []
             for d in FD.search_dirs:
                 dirs += os.listdir(d)
-            self.dirs = set(dirs)
-            self.dir_names = []
-            for dir in self.dirs:
-                self.dir_names.append(dir.split(".")[0])
+            self.dir_names = list(set(dirs))
         except:
             print("Search folder directory failed!")
         else:
             self.local_database.sync_db(self.dir_names)
             try:
-                self.documents_list[0] = [{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_name()]# testing
+                Clock.schedule_once(lambda *x: self._refresh_list(0))
             except IndexError as e:
                 print("document variable not yet created!", e,"\nExpected only once" )
+    
+    def _refresh_list(self, tab):
+        '''
+        updates the documents_list from the database.
+        '''
+        if tab == 0:
+            self.documents_list[tab] = [{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_name()]# testing
 
     def on_add_tabs(self, *args):
         '''
@@ -487,5 +495,6 @@ class BottomNavWindow(MDBottomNavigation):
             self.scrollview_obj.data = self.documents_list[self.current_tab]
         except AttributeError as e:
             print("Scroll View (Recycle View) not yet created!", e,"\nExpected only once" )
+    
   ##############################################################################################################      
          
