@@ -22,6 +22,7 @@
             orientation: "vertical"
             ScreenManager:
                 id: manager
+
                 Screen:
                     name: "login"
                     BoxLayout:
@@ -37,12 +38,12 @@
                             MDTextField:
                                 id: login_email
                                 color_mode: 'custom'
-                                hint_text: 'Email'
+                                hint_text: 'Name/Email'
                                 mode: 'rectangle'
                                 line_color_focus: "orange"
                                 pos_hint: {"center_x": .5}
                                 size_hint: None,None
-                                width: min(dp(295), root.width*0.69)   
+                                width: min(dp(295), dp(root.width*0.69))   
                                 focus: True   
                             TextBox:
                                 id: login_password
@@ -95,6 +96,15 @@
                             orientation:'vertical'
                             spacing: '10dp'
                             MDTextField:
+                                id: signup_name
+                                color_mode: 'custom'
+                                hint_text: 'User Name'
+                                mode: 'rectangle'
+                                line_color_focus: "orange"
+                                pos_hint: {"center_x": .5}
+                                size_hint: None,None
+                                width: min(dp(295), dp(root.width*0.69))
+                            MDTextField:
                                 id: signup_email
                                 color_mode: 'custom'
                                 hint_text: 'Email'
@@ -102,11 +112,11 @@
                                 line_color_focus: "orange"
                                 pos_hint: {"center_x": .5}
                                 size_hint: None,None
-                                width: min(dp(295), root.width*0.69)     
+                                width: min(dp(295), dp(root.width*0.69))     
                             TextBox:
                                 id: signup_password
                             TextBox:
-                                id: "signup_confirm_password"
+                                id: signup_confirm_password
                                 
                         BoxLayout:
                             orientation:'vertical'

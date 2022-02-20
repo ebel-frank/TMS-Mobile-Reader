@@ -1,5 +1,5 @@
 
-__version__ = "0.0.0"
+__version__ = "0.1"
 # kivy imports
 from kivy import require as kivyRequire
 kivyRequire("2.0.0")
