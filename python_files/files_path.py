@@ -11,11 +11,9 @@ class FileDirectories:
     img_dir = app_home + 'assets/images/'
     # Kivy files
     main_kv_file = kv_dir + "main.kv"
-    login_kv_file = kv_dir + "login_signout.kv"
     custom_kv_file = kv_dir + "custom_classes.kv"
     manager_kv_file = kv_dir + "manager.kv"
     document_page_kv_file = kv_dir + "document_page.kv"
-    profile_file = kv_dir + "profile.kv"
     
     # Fonts directory
     lato_black = font_dir + "Lato-Black.ttf"

@@ -26,6 +26,7 @@ from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.clock import Clock
+from kivy.factory import Factory
 import os
 from threading import Thread
 from python_files.TMS_database import TMSDatabase
@@ -170,8 +171,7 @@ class ToolBarTitle(BoxLayout):
         '''
         Changes the display page to profile using the manager
         '''
-        self.parent.parent.transition.direction = 'down'
-        self.parent.parent.current = 'profile'
+        Factory.ProfilePage().open()
     
     def close_and_run_menu(self, val):
         '''
@@ -180,7 +180,7 @@ class ToolBarTitle(BoxLayout):
         self.menu.dismiss()
         if val == "Sign in" or val == "Sign out":
             # switch the window to the signup window
-            self.parent.parent.current = 'login_signout'
+            Factory.LoginSignup().open()
             # manually focus the first text box of the signup window.
             #self.parent.parent.focus_signup()
 
