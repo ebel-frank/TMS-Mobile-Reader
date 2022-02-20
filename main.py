@@ -1,5 +1,5 @@
 
-__version__ = "0.0.0"
+__version__ = "0.1"
 # kivy imports
 from kivy import require as kivyRequire
 kivyRequire("2.0.0")
@@ -58,9 +58,7 @@ class TMSReaderApp(MDApp):
         Builds other kv files not yet loaded (lazy build).
         '''
         Builder.load_file(FileDirectories.manager_kv_file)
-        Builder.load_file(FileDirectories.login_kv_file)
         Builder.load_file(FileDirectories.custom_kv_file)
-        Builder.load_file(FileDirectories.profile_file)
     
     def link_widgets(self):
         '''

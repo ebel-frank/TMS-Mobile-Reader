@@ -20,11 +20,15 @@
             file_icon: FD.file_icon
             items_bg_color: FD.tab_item_color
             items_div_color: FD.tab_nav_color 
+        
+        MDFloatingActionButton:
+            icon: "magnify" if nav_window.current_tab != 1 else "filter"
+            md_bg_color: "orange"
+            icon_color: "white"
+            pos_hint: {"center_x": 0.88}
+            y: "80dp"
+
     
-    LogIn:
-        id: login_signout
-        name: "login_signout"
-    
-    Profile:
-        name: "profile"
+    # Screen
+        #(you can put another screen class here)
                    

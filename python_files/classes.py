@@ -9,11 +9,3 @@ class MainTabs(Screen):
     pass
 
 
-class LogIn(Screen):
-    pass
-
-
-class Profile(Screen):
-    pass
-
-
