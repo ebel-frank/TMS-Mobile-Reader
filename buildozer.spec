@@ -46,7 +46,7 @@ requirements = python3,kivy,https://github.com/kivymd/KivyMD/archive/a15fd665883
 #garden_requirements =
 
 # (str) Presplash of the application
-presplash.filename = atlas://data/images/defaulttheme/modalview-background
+presplash.filename = %(source.dir)s/assets/images/pngs/Divider.png
 
 # (str) Icon of the application
 #icon.filename = %(source.dir)s/data/icon.png
