@@ -51,3 +51,23 @@
     theme_text_color: "Custom"
     text_color: "orange"
     line_color: "orange"
+
+
+<ProfilePage@Popup>:
+    title: "Profile"
+    title_size: "24dp"
+    title_color: "orange"
+    title_align: "center"
+    separator_color: "orange"
+    size_hint: .7, .7
+    pos_hint: {"center_x": .5, "center_y": .5}
+    background: 'white'
+    BoxLayout:
+        orientation: "vertical"
+        BoxLayout:
+            orientation: "vertical"
+            Image:
+                source: FD.account_icon
+        
+        BoxLayout:
+            orientation: "vertical"

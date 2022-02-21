@@ -26,6 +26,7 @@ from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.clock import Clock
+from kivy.factory import Factory
 import os
 from threading import Thread
 from python_files.TMS_database import TMSDatabase
@@ -170,8 +171,9 @@ class ToolBarTitle(BoxLayout):
         '''
         Changes the display page to profile using the manager
         '''
-        self.parent.parent.transition.direction = 'down'
-        self.parent.parent.current = 'profile'
+        # self.parent.parent.transition.direction = 'down'
+        # self.parent.parent.current = 'profile'
+        Factory.ProfilePage().open()
     
     def close_and_run_menu(self, val):
         '''
@@ -274,7 +276,7 @@ class OptionListItem(IRightBodyTouch, MDIconButton):
         adaptive_width = True
         def on_release(self):
             MDApp.get_running_app().open_bottom_sheet()
-            return super().on_release()
+            
 
 
 class LeftIcon(BoxLayout, IconLeftWidgetWithoutTouch):
@@ -300,7 +302,6 @@ class TwoItemList(TwoLineAvatarIconListItem, TouchBehavior):
             print(self.clicked_name)
 
         self.is_long_touch = False
-        return super().on_release()  
     
     def on_long_touch(self, *args):
         self.is_long_touch = True

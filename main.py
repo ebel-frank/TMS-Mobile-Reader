@@ -75,19 +75,41 @@ class TMSReaderApp(MDApp):
         # widgets_obj = Factory.LogIn()
         # self.root.ids.manager.add_widget(widgets_obj)
         # self.root.ids.update(widgets_obj.ids)
-    
+
     def open_bottom_sheet(self):
         '''
         opens the bottom drawer.
         '''
-        obj = MDListBottomSheet()
-        obj.add_item('Add to favourite', lambda x: self.add2favourite(), 'star')
-        obj.add_item('Delete file', lambda x: self.delete_file(), 'delete')
-        obj.add_item('Move file', lambda x: self.move_file(), 'folder-move')
-        obj.add_item('Rename file', lambda x: self.rename_file(), 'rename-box')
-        # obj.add_item('Share file', lambda x: self.share_file(), 'file-send')
-        # obj.add_item('Download audio', lambda x: self.download_audio(), 'download')
-        obj.open()
+        # try:
+        #     self.btmshtobj.dismiss(force=True)
+        # except:
+        #     pass
+        try:
+            if not self.btmshtobj_opened:
+                self.btmshtobj_opened = True
+                self.btmshtobj = MDListBottomSheet(duration_opening=0, radius=15, radius_from="top")
+                self.btmshtobj.add_item('Add to favourite', lambda x: self.add2favourite(), 'star')
+                self.btmshtobj.add_item('Delete file', lambda x: self.delete_file(), 'delete')
+                self.btmshtobj.add_item('Move file', lambda x: self.move_file(), 'folder-move')
+                self.btmshtobj.add_item('Rename file', lambda x: self.rename_file(), 'rename-box')
+                # self.btmshtobj.add_item('Share file', lambda x: self.share_file(), 'file-send')
+                # self.btmshtobj.add_item('Download audio', lambda x: self.download_audio(), 'download')
+                self.btmshtobj.open()
+                self.btmshtobj_opened = False
+        except:
+            self.btmshtobj_opened = False
+            if not self.btmshtobj_opened:
+                self.btmshtobj_opened = True
+                self.btmshtobj = MDListBottomSheet(duration_opening=0, radius=20, radius_from="top")
+                self.btmshtobj.add_item('Add to favourite', lambda x: self.add2favourite(), 'star')
+                self.btmshtobj.add_item('Delete file', lambda x: self.delete_file(), 'delete')
+                self.btmshtobj.add_item('Move file', lambda x: self.move_file(), 'folder-move')
+                self.btmshtobj.add_item('Rename file', lambda x: self.rename_file(), 'rename-box')
+                # self.btmshtobj.add_item('Share file', lambda x: self.share_file(), 'file-send')
+                # self.btmshtobj.add_item('Download audio', lambda x: self.download_audio(), 'download')
+                self.btmshtobj.open()
+                self.btmshtobj_opened = False
+        
     
     def add2favourite(self):
         pass
