@@ -1,5 +1,5 @@
 
-__version__ = "0.1"
+__version__ = "0.2"
 # kivy imports
 from kivy import require as kivyRequire
 kivyRequire("2.0.0")
@@ -95,7 +95,6 @@ class TMSReaderApp(MDApp):
                 # self.btmshtobj.add_item('Share file', lambda x: self.share_file(), 'file-send')
                 # self.btmshtobj.add_item('Download audio', lambda x: self.download_audio(), 'download')
                 self.btmshtobj.open()
-                self.btmshtobj_opened = False
         except:
             self.btmshtobj_opened = False
             if not self.btmshtobj_opened:
@@ -108,7 +107,8 @@ class TMSReaderApp(MDApp):
                 # self.btmshtobj.add_item('Share file', lambda x: self.share_file(), 'file-send')
                 # self.btmshtobj.add_item('Download audio', lambda x: self.download_audio(), 'download')
                 self.btmshtobj.open()
-                self.btmshtobj_opened = False
+        finally:
+            self.btmshtobj_opened = False
         
     
     def add2favourite(self):
