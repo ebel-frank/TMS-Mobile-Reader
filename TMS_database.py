@@ -94,7 +94,5 @@ class TmsDatabase:
         con.close()
 
 
-if __name__ == "__main__":
-    val = TmsDatabase("dev/")
-    # val.insert_files(["Frank", "David", "Ben"])
-    # print(val.get_file_names())
+# if __name__ == "__main__":
+#     val = TmsDatabase("dev/")

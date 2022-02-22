@@ -79,10 +79,6 @@ class FirebaseDatabase:
             return str(e).split("message\": \"")[1].split("\",")[0]
 
 
-if __name__ == "__main__":
-    test = FirebaseDatabase()
-#     username = "Frank"
-#     email = "frankebeledike@gmail.com"
-#     password = "123456"
+# if __name__ == "__main__":
+#     test = FirebaseDatabase()
 #     test.download("/100level/chm111/chm111.txt", "", "chm_handout.txt")
-    print(test.get_cloud_files())
