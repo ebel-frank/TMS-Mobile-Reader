@@ -9,7 +9,7 @@ class TmsDatabase:
         self.path = path
         con = None
         try:
-            con = sqlite3.connect(self.path + "TMS_database.db")
+            con = sqlite3.connect(path + "TMS_database.db")
             cur = con.cursor()
             cur.execute("""
             CREATE TABLE IF NOT EXISTS tmsTable(filename TEXT, open_count INT, timestamp TEXT, starred BOOL)
@@ -22,7 +22,6 @@ class TmsDatabase:
         finally:
             if con:
                 con.close()
-        print("done")
 
     def get_file_names(self):
         """
