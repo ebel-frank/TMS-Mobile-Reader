@@ -1,15 +1,15 @@
 import sqlite3
+import datetime
 
 
 class TmsDatabase:
     def __init__(self, path):
-        self.path = path
         """creates a database in the specified path
-        :param path: the database path
         """
+        self.path = path
         con = None
         try:
-            con = sqlite3.connect(path + "TMS_database.db")
+            con = sqlite3.connect(self.path + "TMS_database.db")
             cur = con.cursor()
             cur.execute("""
             CREATE TABLE IF NOT EXISTS tmsTable(filename TEXT, open_count INT, timestamp TEXT, starred BOOL)
@@ -22,8 +22,9 @@ class TmsDatabase:
         finally:
             if con:
                 con.close()
+        print("done")
 
-    def get_file_name(self):
+    def get_file_names(self):
         """
         :return: a list of all filename and its timestamp
         """
@@ -41,11 +42,13 @@ class TmsDatabase:
         con.close()
         return data
 
-    def set_timestamp(self, filename, current_time):
+    def set_timestamp(self, filename):
         """ updates the timestamp of the filename to the current time
         """
         con = sqlite3.connect(self.path + "TMS_database.db")
-        con.cursor().execute(f"UPDATE tmsTable SET timestamp = {current_time} WHERE filename = {filename}")
+        con.cursor().execute(
+            f"UPDATE tmsTable SET timestamp = {str(datetime.datetime.today()).split('.')[0]} WHERE filename = {filename}"
+        )
         con.commit()
         con.close()
 
@@ -76,7 +79,9 @@ class TmsDatabase:
         """
         con = sqlite3.connect(self.path + "TMS_database.db")
         for i in filenames:
-            con.cursor().execute("INSERT INTO tmsTable VALUES(?,?,?,?)", (i, 0, 0, 0))
+            con.cursor().execute(
+                "INSERT INTO tmsTable VALUES(?,?,?,?)", (i, 0, str(datetime.datetime.today()).split('.')[0], 0)
+            )
         con.commit()
         con.close()
 
@@ -88,5 +93,8 @@ class TmsDatabase:
         con.commit()
         con.close()
 
-# if __name__ == "__main__":
-#     val = TmsDatabase("dev/")
+
+if __name__ == "__main__":
+    val = TmsDatabase("dev/")
+    # val.insert_files(["Frank", "David", "Ben"])
+    # print(val.get_file_names())
