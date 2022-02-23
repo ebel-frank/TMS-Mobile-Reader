@@ -8,16 +8,9 @@ MainManager:
         name: "presplash"
         BoxLayout:
             orientation: 'vertical'
-            MDLabel:
-                text: '[font={}]T M S[/font]'.format(FD.lato_bold)
-                halign: "center"
-                font_style: "H2"
-                markup: True
-                theme_text_color: "Custom"
-                text_color: app.theme_cls.primary_color
             Image:
-                source: FD.loading_gif1
-                anim_delay: 1/60
+                source: FD.presplash
+                allow_stretch: True
     
     Screen:
         id: manager_screen

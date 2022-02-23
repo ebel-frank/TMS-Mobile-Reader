@@ -2,7 +2,7 @@ from kivymd.app import MDApp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.screenmanager import NoTransition
+#from kivy.uix.screenmanager import NoTransition
 from kivy.graphics import Color, Rectangle
 from kivy.metrics import dp
 from kivy.properties import (
@@ -27,7 +27,6 @@ from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.clock import Clock
 from kivy.factory import Factory
-import os
 from threading import Thread
 from python_files.TMS_database import TMSDatabase
 ##########################################################################################################################
@@ -108,6 +107,9 @@ class ToolBarTitle(BoxLayout):
 
     md_font_style = ListProperty([])
 
+    left_title_icon = MDIconButton(icon="account-circle", theme_text_color="Custom", text_color=(1,1,1,1), pos_hint={"x": 0.5, "y": 0.1})
+    right_title_icon = MDIconButton(icon="menu", theme_text_color="Custom", text_color=(1,1,1,1), pos_hint={"x": 0.5, "y": 0.1})
+    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = "vertical"
@@ -119,7 +121,7 @@ class ToolBarTitle(BoxLayout):
         self.right_box = BoxLayout(size_hint_x=None, width=self.pad_right)
         # Icon
         icon = AnchorLayout(anchor_x='left', anchor_y='center')
-        self.left_title_icon = MDIconButton(icon="account-circle", theme_text_color="Custom", text_color=self.color, pos_hint={"x": 0.5, "y": 0.1}, on_press=self.open_profile_page)
+        self.left_title_icon.bind(on_press=self.open_profile_page)
         icon.add_widget(self.left_title_icon)
         # Title
         title = BoxLayout(size_hint_x = 10)
@@ -133,7 +135,7 @@ class ToolBarTitle(BoxLayout):
         title.add_widget(self.title_label)
         # menu
         menu = AnchorLayout(anchor_x='right', anchor_y='center')
-        self.right_title_icon = MDIconButton(icon="menu", theme_text_color="Custom", text_color=self.color, pos_hint={"x": 0.5, "y": 0.1}, on_press=self.open_title_menu)
+        self.right_title_icon.bind(on_press=self.open_title_menu)
         menu.add_widget(self.right_title_icon)
         # Add to main Layout
         title_icon_menu.add_widget(self.left_box)
@@ -171,6 +173,8 @@ class ToolBarTitle(BoxLayout):
         '''
         Changes the display page to profile using the manager
         '''
+        # self.parent.parent.transition.direction = 'down'
+        # self.parent.parent.current = 'profile'
         Factory.ProfilePage().open()
     
     def close_and_run_menu(self, val):
@@ -180,7 +184,8 @@ class ToolBarTitle(BoxLayout):
         self.menu.dismiss()
         if val == "Sign in" or val == "Sign out":
             # switch the window to the signup window
-            Factory.LoginSignup().open()
+            self.parent.parent.transition.direction = 'left'
+            self.parent.parent.current = 'login_signout'
             # manually focus the first text box of the signup window.
             #self.parent.parent.focus_signup()
 
@@ -274,7 +279,7 @@ class OptionListItem(IRightBodyTouch, MDIconButton):
         adaptive_width = True
         def on_release(self):
             MDApp.get_running_app().open_bottom_sheet()
-            return super().on_release()
+            
 
 
 class LeftIcon(BoxLayout, IconLeftWidgetWithoutTouch):
@@ -300,7 +305,6 @@ class TwoItemList(TwoLineAvatarIconListItem, TouchBehavior):
             print(self.clicked_name)
 
         self.is_long_touch = False
-        return super().on_release()  
     
     def on_long_touch(self, *args):
         self.is_long_touch = True
@@ -372,6 +376,20 @@ class BottomNavWindow(MDBottomNavigation):
 
     current_tab = NumericProperty(0)
 
+    local_database = TMSDatabase(FD.database_dir)
+
+    # Load new files to database on start up.
+    try:
+        dirs = []
+        for d in FD.search_dirs:
+            dirs += FD.list_dirs(d)
+        dir_names = list(set(dirs))
+    except Exception as e:
+        print("Search folder directory failed!", e)
+    else:
+        local_database.sync_db(dir_names)
+        
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.tabs = []
@@ -379,23 +397,13 @@ class BottomNavWindow(MDBottomNavigation):
         self.icon_item_obj = []
         self.option_item_obj = []
         self.box2_list = []
-        self.local_database = TMSDatabase(FD.database_dir)
         Thread(target=self._search_dir).start() # should be multiprocessed
 
     def _search_dir(self, *args):
         try:
-            dirs = []
-            for d in FD.search_dirs:
-                dirs += os.listdir(d)
-            self.dir_names = list(set(dirs))
-        except:
-            print("Search folder directory failed!")
-        else:
-            self.local_database.sync_db(self.dir_names)
-            try:
-                Clock.schedule_once(lambda *x: self._refresh_list(0))
-            except IndexError as e:
-                print("document variable not yet created!", e,"\nExpected only once" )
+            Clock.schedule_once(lambda *x: self._refresh_list(0))
+        except IndexError as e:
+            print("document variable not yet created!", e,"\nExpected only once" )
     
     def _refresh_list(self, tab):
         '''
@@ -403,13 +411,15 @@ class BottomNavWindow(MDBottomNavigation):
         '''
         if tab == 0:
             self.documents_list[tab] = [{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_name()]# testing
+        # probably delete this guy (not well implemented)
+            self.documents_list[1] = self.documents_list[0]+[{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_name()]# testing
 
     def on_add_tabs(self, *args):
         '''
         Initiate the Addition of the given navigation tabs on add_tabs specification.
         '''
         self._create_tabs()
-        self.children[1].transition = NoTransition()
+        #self.children[1].transition = NoTransition()
 
     def on_bg_color(self, *args):
         '''
@@ -475,7 +485,7 @@ class BottomNavWindow(MDBottomNavigation):
         with self.box1.canvas.before:
            self.box1.color_obj = Color(rgba=self.bg_color)
            self.box1.rect_obj = Rectangle(size=self.box1.size, pos=self.box1.size)
-        self.scrollview_obj = RV(self.documents_list[0])
+        self.scrollview_obj = RV([])
         box2.add_widget(self.scrollview_obj)
         self.box1.add_widget(box2)
         return self.box1
@@ -495,6 +505,9 @@ class BottomNavWindow(MDBottomNavigation):
             self.scrollview_obj.data = self.documents_list[self.current_tab]
         except AttributeError as e:
             print("Scroll View (Recycle View) not yet created!", e,"\nExpected only once" )
+        FD()
+
+        
     
   ##############################################################################################################      
          

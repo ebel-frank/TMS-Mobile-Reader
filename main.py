@@ -1,5 +1,5 @@
 
-__version__ = "0.1"
+__version__ = "0.2"
 # kivy imports
 from kivy import require as kivyRequire
 kivyRequire("2.0.0")
@@ -12,6 +12,7 @@ from kivy.uix.screenmanager import ScreenManager
 from kivymd.uix.bottomsheet import MDListBottomSheet
 # python imports
 from threading import Thread
+from time import sleep
 # local imports
 from python_files.files_path import FileDirectories
 
@@ -24,7 +25,7 @@ class TMSReaderApp(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.theme_cls.primary_palette = "Orange"
-        self.theme_cls.primary_hue = "A700"
+        self.theme_cls.primary_hue = "A400"
 
     def build(self):
         return Builder.load_file(FileDirectories.main_kv_file)
@@ -41,9 +42,8 @@ class TMSReaderApp(MDApp):
         '''
         self.import_classes()
         self.load_kv_files()
+        sleep(3)
         Clock.schedule_once(lambda x: self.link_widgets())
-        # Change to loaded screen
-        self.root.current = "manager_screen"
     
     def import_classes(self):
         '''
@@ -73,19 +73,45 @@ class TMSReaderApp(MDApp):
         # widgets_obj = Factory.LogIn()
         # self.root.ids.manager.add_widget(widgets_obj)
         # self.root.ids.update(widgets_obj.ids)
-    
+
+        # Change to loaded screen
+        self.root.current = "manager_screen"
+
     def open_bottom_sheet(self):
         '''
         opens the bottom drawer.
         '''
-        obj = MDListBottomSheet()
-        obj.add_item('Add to favourite', lambda x: self.add2favourite(), 'star')
-        obj.add_item('Delete file', lambda x: self.delete_file(), 'delete')
-        obj.add_item('Move file', lambda x: self.move_file(), 'folder-move')
-        obj.add_item('Rename file', lambda x: self.rename_file(), 'rename-box')
-        # obj.add_item('Share file', lambda x: self.share_file(), 'file-send')
-        # obj.add_item('Download audio', lambda x: self.download_audio(), 'download')
-        obj.open()
+        # try:
+        #     self.btmshtobj.dismiss(force=True)
+        # except:
+        #     pass
+        try:
+            if not self.btmshtobj_opened:
+                self.btmshtobj_opened = True
+                self.btmshtobj = MDListBottomSheet(duration_opening=0, radius=15, radius_from="top", on_dismiss=self._exit_btmshtobj)
+                self.btmshtobj.add_item('Add to favourite', lambda x: self.add2favourite(), 'star')
+                self.btmshtobj.add_item('Delete file', lambda x: self.delete_file(), 'delete')
+                self.btmshtobj.add_item('Download', lambda x: self.download_file(), 'download')
+                self.btmshtobj.add_item('Move file', lambda x: self.move_file(), 'folder-move')
+                self.btmshtobj.add_item('Rename file', lambda x: self.rename_file(), 'rename-box')
+                self.btmshtobj.add_item('Details', lambda x: self.file_details(), 'information')
+                self.btmshtobj.open()
+        except:
+            self.btmshtobj_opened = False
+            if not self.btmshtobj_opened:
+                self.btmshtobj_opened = True
+                self.btmshtobj = MDListBottomSheet(duration_opening=0, radius=20, radius_from="top", on_dismiss=self._exit_btmshtobj)
+                self.btmshtobj.add_item('Add to favourite', lambda x: self.add2favourite(), 'star')
+                self.btmshtobj.add_item('Delete file', lambda x: self.delete_file(), 'delete')
+                self.btmshtobj.add_item('Download', lambda x: self.download_file(), 'download')
+                self.btmshtobj.add_item('Move file', lambda x: self.move_file(), 'folder-move')
+                self.btmshtobj.add_item('Rename file', lambda x: self.rename_file(), 'rename-box')
+                self.btmshtobj.add_item('Details', lambda x: self.file_details(), 'information')
+                self.btmshtobj.open()
+    
+    def _exit_btmshtobj(self, *args):
+        self.btmshtobj_opened = False
+        
     
     def add2favourite(self):
         pass
@@ -98,11 +124,13 @@ class TMSReaderApp(MDApp):
 
     def rename_file(self):
         pass
+    
+    def download_file(self):
+        pass
 
-    # def share_file(self):
-    #     pass
-    # def download_audio(self):
-    #     pass
+    def file_details(self):
+        pass
+    
 
 if __name__ == '__main__':
     TMSReaderApp().run()
