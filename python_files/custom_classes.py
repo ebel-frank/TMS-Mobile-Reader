@@ -410,9 +410,9 @@ class BottomNavWindow(MDBottomNavigation):
         updates the documents_list from the database.
         '''
         if tab == 0:
-            self.documents_list[tab] = [{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_name()]# testing
+            self.documents_list[tab] = [{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_names()]# testing
         # probably delete this guy (not well implemented)
-            self.documents_list[1] = self.documents_list[0]+[{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_name()]# testing
+            self.documents_list[1] = self.documents_list[0]+[{"text": i, "secondary_text": j} for i, j in self.local_database.get_file_names()]# testing
 
     def on_add_tabs(self, *args):
         '''
