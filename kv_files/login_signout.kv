@@ -4,20 +4,27 @@
     name: "login_signout"
     BoxLayout:
         orientation: "vertical"
-        AnchorLayout:
-            achor_x: "center"
-            anchor_y: "center"
+        RelativeLayout:
             size_hint_y: .1
             canvas.before:
                 Color:
                     rgba: (1, 165/255, 0, 1)
                 Rectangle:
                     size: self.size
-                    pos: self.pos
             Label:
                 markup: True
                 text: "[b]T M S[/b]"
                 font_size: "24dp"
+                pos_hint: {"center_x": .5, "center_y": .5}
+            MDIconButton:
+                icon: "close-box"
+                pos_hint: {'center_y': 0.5, "right": 1}
+                theme_text_color: "Custom"
+                text_color: 'white'
+                on_release: 
+                    root.parent.transition.direction = "right"
+                    root.parent.current = "main_tabs"
+                    manager.current = 'login'
         BoxLayout:
             orientation: "vertical"
             ScreenManager:
@@ -52,7 +59,7 @@
                             orientation:'vertical'
                             AnchorLayout:                   
                                 Image:
-                                    source: FD.img_dir + "pngs/Divider.png"
+                                    source: FD.img_dir + "/pngs/Divider.png"
                                     allow_stretch: True  
                                     size_hint: None, None
                                     size: (dp(24), dp(4))
@@ -122,7 +129,7 @@
                             orientation:'vertical'
                             AnchorLayout:                   
                                 Image:
-                                    source: FD.img_dir + "pngs/Divider.png"
+                                    source: FD.img_dir + "/pngs/Divider.png"
                                     allow_stretch: True  
                                     size_hint: None, None
                                     size: (dp(24), dp(4))   
@@ -139,6 +146,9 @@
                                     markup: True
                                     text: "[b]REGISTER[/b]"
                                     size_hint: 1, None
+                                    on_release:
+                                        # #
+                                        # manager.current = 'login'
                                 BoxLayout:
                                     size_hint: None, None
                                     size: "200dp", "10dp"
@@ -152,4 +162,5 @@
                                     on_release:
                                         manager.transition.direction = "right"
                                         manager.current = 'login'
+    
                 

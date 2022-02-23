@@ -13,7 +13,7 @@
         
         BottomNavWindow:
             id: nav_window
-            documents_list: [FD.local_files, FD.cloud_files, FD.cloud_files, FD.local_files]
+            documents_list: [[], [], FD.cloud_files, []]
             add_tabs: (('recent', 'recent', 'timelapse'), ('local', 'local', 'library'), ('cloud', 'cloud', 'library'), ('starred', 'starred', 'star'))
             panel_color: FD.tab_nav_color
             bg_color: FD.tab_bg_color
@@ -22,11 +22,13 @@
             items_div_color: FD.tab_nav_color 
         
         MDFloatingActionButton:
+            id: floating_btn
             icon: "magnify" if nav_window.current_tab != 1 else "filter"
             md_bg_color: "orange"
             icon_color: "white"
             pos_hint: {"center_x": 0.88}
             y: "80dp"
+            opacity: 0
 
     
     LogIn:
