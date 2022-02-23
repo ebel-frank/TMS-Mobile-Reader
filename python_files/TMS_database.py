@@ -1,12 +1,12 @@
 import sqlite3
+import datetime
 
 
 class TMSDatabase:
     def __init__(self, path):
-        self.path = path
         """creates a database in the specified path
-        :param path: the database path
         """
+        self.path = path
         con = None
         try:
             con = sqlite3.connect(path + "TMS_database.db")
@@ -23,7 +23,7 @@ class TMSDatabase:
             if con:
                 con.close()
 
-    def get_file_name(self):
+    def get_file_names(self):
         """
         :return: a list of all filename and its timestamp
         """
@@ -41,11 +41,13 @@ class TMSDatabase:
         con.close()
         return data
 
-    def set_timestamp(self, filename, current_time):
+    def set_timestamp(self, filename):
         """ updates the timestamp of the filename to the current time
         """
         con = sqlite3.connect(self.path + "TMS_database.db")
-        con.cursor().execute(f"UPDATE tmsTable SET timestamp = {current_time} WHERE filename = {filename}")
+        con.cursor().execute(
+            f"UPDATE tmsTable SET timestamp = {str(datetime.datetime.today()).split('.')[0]} WHERE filename = {filename}"
+        )
         con.commit()
         con.close()
 
@@ -76,7 +78,9 @@ class TMSDatabase:
         """
         con = sqlite3.connect(self.path + "TMS_database.db")
         for i in filenames:
-            con.cursor().execute("INSERT INTO tmsTable VALUES(?,?,?,?)", (i, 0, 0, 0))
+            con.cursor().execute(
+                "INSERT INTO tmsTable VALUES(?,?,?,?)", (i, 0, str(datetime.datetime.today()).split('.')[0], 0)
+            )
         con.commit()
         con.close()
 
@@ -87,6 +91,7 @@ class TMSDatabase:
         con.cursor().execute(f"DELETE FROM tmsTable WHERE filename = ?", (filename,))
         con.commit()
         con.close()
+
 
 # if __name__ == "__main__":
 #     val = TmsDatabase("dev/")
