@@ -1,5 +1,5 @@
 
-<RV>:
+<RV>
     viewclass: 'SelectableLabel'
     SelectableRecycleBoxLayout:
         default_size: None, dp(56)
@@ -10,9 +10,9 @@
         multiselect: True
         touch_multiselect: True
     
-<TextBox@RelativeLayout>:
+<TextBox@RelativeLayout>
     size_hint: None,None
-    # width: min(dp(295), dp(root.parent.parent.width*0.69))
+    width: min(dp(295), dp(root.parent.parent.width*0.69))
     height: "75dp"
     pos_hint: {"center_x": .5}
     MDTextField:
@@ -40,12 +40,12 @@
             text_field.focus = True
 
 
-<FlatButton@MDRaisedButton>:
+<FlatButton@MDRaisedButton>
     theme_text_color: "Custom"
     text_color: "white"
     md_bg_color: "orange"
 
-<RectangleButton@MDRectangleFlatButton>:
+<RectangleButton@MDRectangleFlatButton>
     markup: True
     text: "[b]SIGN UP[/b]"
     theme_text_color: "Custom"
