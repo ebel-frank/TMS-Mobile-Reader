@@ -99,3 +99,4 @@ class FileDirectories:
     def __init__(self) -> None:
         if platform == "android":
             self.statusbar(self.top_nav_color, self.bottom_nav_color)
+            
