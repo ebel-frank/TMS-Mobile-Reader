@@ -22,4 +22,3 @@ class LogIn(Screen):
 class Profile(Screen):
     pass
 
-
