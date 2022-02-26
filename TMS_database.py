@@ -23,13 +23,21 @@ class TmsDatabase:
             if con:
                 con.close()
 
-    def get_file_names(self):
+    def get_file_names(self, sort_type: int):
         """
+        :param sort_type: 0 to sort alphabetically or 1 to sort by date
         :return: a list of all filename and its timestamp
         """
         con = sqlite3.connect(self.path + "TMS_database.db")
-        data = con.cursor().execute("SELECT filename, timestamp FROM tmsTable").fetchall()
+        if sort_type:
+            statement = "SELECT filename, timestamp FROM tmsTable ORDER BY filename ASC"
+        else:
+            statement = "SELECT filename, timestamp FROM tmsTable ORDER BY timestamp ASC"
+        data = con.cursor().execute(statement).fetchall()
         con.close()
+        for i in range(len(data)):
+            data[i] = list(data[i])
+            data[i][1] = get_time(data[i][1])
         return data
 
     def get_starred_files(self):
@@ -46,7 +54,17 @@ class TmsDatabase:
         """
         con = sqlite3.connect(self.path + "TMS_database.db")
         con.cursor().execute(
-            f"UPDATE tmsTable SET timestamp = {str(datetime.datetime.today()).split('.')[0]} WHERE filename = {filename}"
+            f"UPDATE tmsTable SET timestamp = ?, open_count = open_count + ? WHERE filename = ?",
+            (str(datetime.datetime.today()).split('.')[0], 1, filename)
+        )
+        con.commit()
+        con.close()
+
+    def set_starred(self, filename):
+        con = sqlite3.connect(self.path + "TMS_database.db")
+        con.cursor().execute(
+            f"UPDATE tmsTable SET starred = CASE WHEN open_count > 15 THEN 1 ELSE NOT starred END WHERE filename = ?",
+            filename
         )
         con.commit()
         con.close()
@@ -62,7 +80,8 @@ class TmsDatabase:
         filename = ["%s" % x for x in cur.execute("SELECT filename FROM tmsTable").fetchall()]
         for i in filenames:
             if i not in filename:
-                cur.execute("INSERT INTO tmsTable VALUES(?,?,?,?)", (i, 0, 0, 0))
+                cur.execute("INSERT INTO tmsTable VALUES(?,?,?,?)",
+                            (i, 0, str(datetime.datetime.today()).split('.')[0], 0))
         con.commit()
         filename = ["%s" % x for x in cur.execute("SELECT filename FROM tmsTable").fetchall()]
         for i in filename:
@@ -91,6 +110,20 @@ class TmsDatabase:
         con.cursor().execute(f"DELETE FROM tmsTable WHERE filename = ?", (filename,))
         con.commit()
         con.close()
+
+
+def get_time(timestamp):
+    d1 = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+    d2 = datetime.datetime.today()
+    diff = (d2 - d1).days
+    if diff == 0:
+        return "Today"
+    elif diff == 1:
+        return "Yesterday"
+    elif diff > 7:
+        return "A long time ago"
+    else:
+        return f"{diff} days ago"
 
 
 # if __name__ == "__main__":
